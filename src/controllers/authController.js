@@ -1,6 +1,7 @@
 const usersModel = require("../models/usersModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const HttpError = require("../error/HttpError");
 
 module.exports = {
   //Post /auth/register
@@ -22,12 +23,9 @@ module.exports = {
   //post /atuh/login
   login: (req, res) => {
     const { email, password } = req.body;
+    if (typeof email !== "string" || typeof password !== "string") throw new HttpError(400, "Todos os campos são obrigatórios");
 
-    if (typeof email !== "string" || typeof password !== "string") {
-      return res.status(400).json({ message: "Todos os campos são obrigatórios" });
-    }
     const user = usersModel.getUserByEmail(email);
-
     if (!user) return res.status(400).json({ message: "Usuário não encontrado" });
 
     const isValidPassword = bcrypt.compareSync(password, user.password);
